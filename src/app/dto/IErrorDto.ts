@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-export default function Home() {
-    return (
-        <main className="flex justify-center">
-            Home
-        </main>
-    );
+export default interface IErrorDto {
+    Type: string;
+    Title: string;
+    Status: number;
+    Detail: string;
+    TraceId: string;
 }
