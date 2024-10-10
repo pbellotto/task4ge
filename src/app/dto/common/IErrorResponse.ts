@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-export default interface IErrorDto {
+export default interface IErrorResponse {
     Type: string;
     Title: string;
     Status: number;

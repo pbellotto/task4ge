@@ -14,25 +14,24 @@
  * limitations under the License.
  */
 
-import IProductDto from '../dto/IProductDto';
-import IErrorDto from '../dto/IErrorDto';
+import IErrorResponse from '../dto/common/IErrorResponse';
+import IGetAllResponse from '../dto/tasks/IGetAllResponse';
 
 class TaskService {
-    public async getAll(accessToken: string): Promise<IProductDto[]> {
+    public async GetAll(accessToken: string): Promise<IGetAllResponse[]> {
         const init: RequestInit = {
             method: 'GET',
             mode: 'cors',
             headers: { 'Authorization': `Bearer ${accessToken}` },
             cache: 'default'
         };
-        const response: Response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_BASE_URI}/tasks`, init);
+        const response: Response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_BASE_URI}/Task/GetAll`, init);
         if (!response.ok) {
-            const error: IErrorDto = await response.json();
+            const error: IErrorResponse = await response.json();
             throw new Error(error.Detail);
         }
 
-        const ret = await response.json();
-        return ret.data;
+        return await response.json();
     }
 }
 
