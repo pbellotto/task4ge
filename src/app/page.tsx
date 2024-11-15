@@ -14,24 +14,8 @@
  * limitations under the License.
  */
 
-import IGetAllResponse from './dto/tasks/IGetAllResponse';
-import TaskService from './services/TaskService';
-
-async function getTasks(): Promise<IGetAllResponse[] | undefined> {
-    try {
-        return await TaskService.GetAll('');
-    } catch (err: any) {
-        console.error(err.message);
-    }
-}
-
 export default async function Home() {
-    const tasks: IGetAllResponse[] = await getTasks() || [];
     return (
-        tasks.map((task) => (
-            <div className="row row-cols-6" key={task.Id}>
-                {task.Name}
-            </div>
-        ))
+        <div className='text-center sm:text-center'>Home</div>
     );
 }
