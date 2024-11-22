@@ -14,24 +14,28 @@
  * limitations under the License.
  */
 
-import IErrorResponse from '../dto/common/IErrorResponse';
 import IGetAllResponse from '../dto/tasks/IGetAllResponse';
+import IGetResponse from '../dto/tasks/IGetResponse';
+import apiClient from '../utils/api-client';
 
 class TaskService {
-    public async GetAll(accessToken: string): Promise<IGetAllResponse[]> {
-        const init: RequestInit = {
-            method: 'GET',
-            mode: 'cors',
-            headers: { 'Authorization': `Bearer ${accessToken}` },
-            cache: 'default'
-        };
-        const response: Response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_BASE_URI}/Task/GetAll`, init);
-        if (!response.ok) {
-            const error: IErrorResponse = await response.json();
-            throw new Error(error.Detail);
+    public async get(id: string): Promise<IGetResponse> {
+        try {
+            const response = await apiClient.get(`/Task/${id}`);
+            return response.data;
+        } catch (error: any) {
+            console.log(error)
+            throw new Error(error);
         }
+    }
 
-        return await response.json();
+    public async getAll(): Promise<IGetAllResponse[]> {
+        try {
+            const response = await apiClient.get('/Task/GetAll');
+            return response.data;
+        } catch (error: any) {
+            throw new Error(error.response.data);
+        }
     }
 }
 

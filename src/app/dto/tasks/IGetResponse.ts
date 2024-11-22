@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
-export default interface IErrorResponse {
-    type: string;
-    title: string;
-    status: number;
-    detail: string;
-    traceId: string;
+export default interface IGetResponse {
+    Id: string;
+    CreatedAt: Date;
+    UpdatedAt: Date;
+    Priority: number;
+    Name: string;
+    Description: string;
+    StartDate: Date | null;
+    EndDate: Date | null;
+    Images: string[] | null;
+    Completed: boolean;
 }

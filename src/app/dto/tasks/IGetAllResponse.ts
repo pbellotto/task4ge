@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-export default interface GetAllResponse {
+export default interface IGetAllResponse {
     Id: string;
     Name: string;
-    CreatedAt: Date;
-    UpdatedAt: Date;
+    Description: string;
+    StartDate: Date | null;
+    EndDate: Date | null;
 }

@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-export default interface IErrorResponse {
-    type: string;
-    title: string;
-    status: number;
-    detail: string;
-    traceId: string;
+import styles from './ProgressBar.module.css';
+
+export default function ProgressBar({ loading }: { loading: boolean }) {
+    return (
+        <div className={`w-full ${!loading ? 'hidden' : ''}`}>
+            <div className='h-1 w-full bg-[#66C9FF] overflow-hidden'>
+                <div className={`${styles.progress} w-full h-full bg-[#017cc2] ${styles['left-right']}`}></div>
+            </div>
+        </div>
+    );
 }

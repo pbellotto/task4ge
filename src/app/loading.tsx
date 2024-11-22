@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-export default interface IErrorResponse {
-    type: string;
-    title: string;
-    status: number;
-    detail: string;
-    traceId: string;
+import ProgressBar from './components/ProgressBar/ProgressBar';
+
+export default function Loading() {
+    return <ProgressBar loading></ProgressBar>
 }

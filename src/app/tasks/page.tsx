@@ -14,91 +14,46 @@
  * limitations under the License.
  */
 
-import { getAccessToken, withPageAuthRequired } from '@auth0/nextjs-auth0';
-import styles from './page.module.css'
+import { withPageAuthRequired } from '@auth0/nextjs-auth0';
 import TaskService from '../services/TaskService';
-import { Suspense } from 'react';
 import IGetAllResponse from '../dto/tasks/IGetAllResponse';
+import Link from 'next/link';
 
-async function getTasks(accessToken: string): Promise<IGetAllResponse[] | undefined> {
+async function getAll(): Promise<IGetAllResponse[] | undefined> {
     try {
-        return await TaskService.GetAll(accessToken);
+        return await TaskService.getAll();
     } catch (err: any) {
         console.error(err.message);
+        throw err;
     }
-}
-
-async function TaskAddBar() {
-    return (
-        <div className='row text-center'>
-            <div className={styles['btn-edit-delete']}>
-                <a type="button" className='btn' title="Add" data-bs-toggle="modal" data-bs-target="#product-add-modal">
-                    <i className="bi-plus-circle" style={{ paddingRight: 3 }} />
-                    <span>Add Product</span>
-                </a>
-            </div>
-        </div>
-    );
-}
-
-async function TaskGridHeader() {
-    return (
-        <div className="row row-cols-6">
-            <div className="col-md-4">
-                <b>Name</b>
-            </div>
-            <div className="col-md-4">
-                <b>Ctg.</b>
-            </div>
-            <div className="col-md-1 text-end">
-                <b>Proof</b>
-            </div>
-            <div className="col-md-1 text-end">
-                <b>Qtd.</b>
-            </div>
-            <div className="col-md-1 text-end">
-                <b>Price</b>
-            </div>
-            <div className="col-md-auto">
-            </div>
-        </div>
-    );
-}
-
-async function TaskGrid({ accessToken }: { accessToken: string | undefined }) {
-    const tasks: IGetAllResponse[] = await getTasks(accessToken!) || [];
-    return (
-        tasks.map((task) => (
-            <div className="row row-cols-6" key={task.Id}>
-                <div className="col-md-4 text-wrap">
-                    <span>{task.Name}</span>
-                </div>
-                <div className="col-md-auto">
-                    <div className={styles['btn-edit-delete']}>
-                        <button type="button" className="btn btn-primary btn-sm" title="Edit"><i className="bi-pen"></i></button>
-                    </div>
-                    <div className={styles['btn-edit-delete']}>
-                        <button type="button" className="btn btn-danger btn-sm" title="Delete"><i aria-hidden className="bi-x-lg"></i></button>
-                    </div>
-                </div>
-            </div>))
-    );
 }
 
 export default withPageAuthRequired(
     async function Tasks() {
-        const { accessToken } = await getAccessToken();
+        const response: IGetAllResponse[] = await getAll() || [];
 
         return (
-            <main className={styles.main}>
-                <div className="container">
-                    <TaskAddBar />
-                    <TaskGridHeader />
-                    <Suspense fallback={<div>Loading...</div>}>
-                        <TaskGrid accessToken={accessToken} />
-                    </Suspense>
+            <main>
+                <div className='container mx-auto w-full max-w-screen-xl px-4 py-2'>
+                    <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2'>
+                        {
+                            response.map((task) => (
+                                <Link href={`/task/${task.Id}`} key={task.Id}>
+                                    <div className='h-32 bg-[#017cc2] text-gray-50 font-medium rounded-lg border px-4 py-2'>
+                                        <div className="px-1 py-2">
+                                            <div className="text-lg font-bold mb-1 text-pretty line-clamp-1">
+                                                {task.Name}
+                                            </div>
+                                            <p className='text-sm text-pretty line-clamp-3'>
+                                                {task.Description}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </Link>))
+                        }
+                    </div>
                 </div>
             </main>
         );
-    }, { returnTo: '/tasks' }
+    }
 );

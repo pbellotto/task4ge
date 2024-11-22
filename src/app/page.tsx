@@ -16,6 +16,10 @@
 
 export default async function Home() {
     return (
-        <div className='text-center sm:text-center'>Home</div>
+        <main>
+            <div className='text-center sm:text-center'>
+                Home
+            </div>
+        </main>
     );
 }
