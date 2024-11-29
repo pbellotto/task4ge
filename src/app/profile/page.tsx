@@ -18,7 +18,6 @@
 
 import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { useState } from 'react';
-import ProgressBar from '../components/ProgressBar/ProgressBar';
 
 export function Profile() {
     const { user } = useUser();

@@ -17,40 +17,62 @@
 'use client';
 
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
-import TaskService from '../../services/TaskService';
 import IGetResponse from '../../dto/tasks/IGetResponse';
 import useSWR from 'swr';
-import React from 'react';
-import apiClient from '@/app/utils/api-client';
+import React, { useEffect, useState } from 'react';
+import Loading from '@/app/loading';
 
-async function fetcher(id: any): Promise<IGetResponse | undefined> {
+const fetcher = async ([url, accessToken]: string[]): Promise<IGetResponse | undefined> => {
+    if (!accessToken) {
+        return;
+    }
+
     try {
-        const response = await apiClient.get(`/Task/${id}`);
-        return response.data;
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+
+        return response.json();
     } catch (error: any) {
-        console.log(error)
-        throw new Error(error);
+        if (error['cause']?.code === 'ECONNREFUSED') {
+            throw new Error("Connection refused by server.");
+        }
+
+        throw error;
     }
 }
 
 export default withPageAuthRequired(
     function Task({ params }: any) {
-        const { id }: any = React.use(params)
-        const { data, error } = useSWR(id, fetcher)
-        if (!data) {
-            return (
-                <main>
-                    <div className='container mx-auto w-full max-w-screen-xl px-4 py-60'>
-                        <p className='text-gray-800 text-2xl text-center font-extrabold'>TASK NOT FOUND</p>
-                    </div>
-                </main>
-            );
+        const [accessToken, setAccessToken] = useState<string>('');
+        useEffect(() => {
+            const getAccessToken = async () => {
+                const response = await fetch('/api/getToken');
+                const data = await response.json();
+                setAccessToken(data.token);
+            };
+
+            getAccessToken();
+        }, [accessToken]);
+
+        const { data, isLoading } = useSWR([`${process.env.NEXT_PUBLIC_SERVER_BASE_URI}/Task/${params?.id}`, accessToken], fetcher)
+        const [formData, setFormData] = useState({ Description: data?.Description });
+        if (!accessToken || !data || isLoading) {
+            return <Loading />;
         }
 
         return (
             <main>
                 <div className='container mx-auto w-full max-w-screen-xl px-4 py-2'>
-                    {data?.Name}
+                    {formData?.Description}
                 </div>
             </main>
         );

@@ -14,30 +14,44 @@
  * limitations under the License.
  */
 
-import { withPageAuthRequired } from '@auth0/nextjs-auth0';
-import TaskService from '../services/TaskService';
+import { getAccessToken, withPageAuthRequired } from '@auth0/nextjs-auth0';
 import IGetAllResponse from '../dto/tasks/IGetAllResponse';
 import Link from 'next/link';
 
-async function getAll(): Promise<IGetAllResponse[] | undefined> {
+const fetcher = async (accessToken: string): Promise<IGetAllResponse[]> => {
     try {
-        return await TaskService.getAll();
-    } catch (err: any) {
-        console.error(err.message);
-        throw err;
+        const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_BASE_URI}/Task/GetAll`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+
+        return response.json();
+    } catch (error: any) {
+        if (error['cause']?.code === 'ECONNREFUSED') {
+            throw new Error("Connection refused by server.");
+        }
+
+        throw error;
     }
 }
 
 export default withPageAuthRequired(
     async function Tasks() {
-        const response: IGetAllResponse[] = await getAll() || [];
-
+        const { accessToken } = await getAccessToken();
+        const data = await fetcher(accessToken!);
         return (
             <main>
                 <div className='container mx-auto w-full max-w-screen-xl px-4 py-2'>
                     <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2'>
                         {
-                            response.map((task) => (
+                            data!.map((task) => (
                                 <Link href={`/task/${task.Id}`} key={task.Id}>
                                     <div className='h-32 bg-[#017cc2] text-gray-50 font-medium rounded-lg border px-4 py-2'>
                                         <div className="px-1 py-2">
