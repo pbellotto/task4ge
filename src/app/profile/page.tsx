@@ -25,7 +25,7 @@ export function Profile() {
 
     return (
         <main>
-            <div className="container mx-auto w-full max-w-screen-xl px-4">
+            <div className="container mx-auto w-full max-w-screen-xl px-4 py-2">
                 <form>
                     <div className="border-b border-gray-900/10 pb-12">
                         <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">

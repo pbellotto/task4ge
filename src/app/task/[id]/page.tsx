@@ -21,6 +21,7 @@ import IGetResponse from '../../dto/tasks/IGetResponse';
 import useSWR from 'swr';
 import React, { useEffect, useState } from 'react';
 import Loading from '@/app/loading';
+import { useForm } from 'react-hook-form';
 
 const fetcher = async ([url, accessToken]: string[]): Promise<IGetResponse | undefined> => {
     if (!accessToken) {
@@ -64,15 +65,61 @@ export default withPageAuthRequired(
         }, [accessToken]);
 
         const { data, isLoading } = useSWR([`${process.env.NEXT_PUBLIC_SERVER_BASE_URI}/Task/${params?.id}`, accessToken], fetcher)
-        const [formData, setFormData] = useState({ Description: data?.Description });
-        if (!accessToken || !data || isLoading) {
+        const { register, handleSubmit, reset } = useForm();
+        useEffect(() => {
+            if (data) {
+                reset({
+                    Name: data.Name,
+                    Description: data.Description
+                });
+            }
+        }, [data, reset]);
+        const onSubmit = (formData: any) => {
+            // Send data to server
+        };
+
+
+        if (!accessToken || isLoading) {
             return <Loading />;
+        }
+
+        if (!data) {
+            return <div>Error on data loading!</div>;
         }
 
         return (
             <main>
                 <div className='container mx-auto w-full max-w-screen-xl px-4 py-2'>
-                    {formData?.Description}
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                        <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                            <div className="sm:col-span-3">
+                                <label htmlFor="name" className="block text-sm/6 font-medium text-gray-900">
+                                    Name
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        id="name"
+                                        {...register("Name")}
+                                        name="name"
+                                        type="text"
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm/6" />
+                                </div>
+                            </div>
+                            <div className="sm:col-span-3">
+                                <label htmlFor="description" className="block text-sm/6 font-medium text-gray-900">
+                                    Description
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        id="description"
+                                        {...register("Description")}
+                                        name="description"
+                                        type="text"
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-800 sm:text-sm/6" />
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </main>
         );
